@@ -8,6 +8,7 @@ import ch.drugify.server.server.DrugsRepository;
 import ch.drugify.server.server.UsersHistoryRepository;
 import ch.drugify.server.server.UsersRepository;
 import ch.drugify.server.utility.Converter;
+import ch.drugify.server.utility.EntityGenerator;
 import ch.drugify.server.validation.ConflictCheck;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,8 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
-//import javax.ws.rs.core.Response;
 
 @CrossOrigin(origins = "*")
 @Controller
@@ -30,6 +31,16 @@ public class UsersController {
     private UsersHistoryRepository historyRepository;
     @Autowired
     private DrugsRepository drugsRepository;
+
+    @RequestMapping(value="/")
+    public void createInitUser(){
+        Users user = new Users();
+        user.setFirstname("Rather");
+        user.setLastname("Short");
+        user.setMail("test@example.ch");
+        user.setUserName("RaShorth");
+        userRepository.addUser(user);
+    }
 
     @RequestMapping(value = "/api/users/", method = RequestMethod.PUT, produces="application/json")
     @ResponseBody
@@ -65,7 +76,15 @@ public class UsersController {
     @RequestMapping(value="/api/users/{user-id}/drugs", method=RequestMethod.GET, produces="application/json")
     public String getAllDrugsOfUser(@PathVariable("user-id")String userId){
         UsersHistory history = historyRepository.getUserHistoryById(userId);
-        if(history==null)return "";
+        if(history==null){
+            //return random list if no data is available
+            List<HistoryItem> randomList = new ArrayList<HistoryItem>();
+            randomList.add(EntityGenerator.getHistoryItem(drugsRepository, "62553"));
+            randomList.add(EntityGenerator.getHistoryItem(drugsRepository, "14825"));
+            randomList.add(EntityGenerator.getHistoryItem(drugsRepository, "51908"));
+            randomList.add(EntityGenerator.getHistoryItem(drugsRepository, "53662"));
+            return Converter.convertToJson(randomList);
+        }
         List<HistoryItem> items = history.allItems;
         return Converter.convertToJson(items);
     }

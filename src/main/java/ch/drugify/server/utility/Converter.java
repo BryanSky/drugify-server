@@ -2,8 +2,6 @@ package ch.drugify.server.utility;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mongodb.util.JSON;
-import net.minidev.json.JSONObject;
 
 import java.io.IOException;
 
@@ -22,8 +20,6 @@ public class Converter {
 
     public static Object convertFromJson(String json, Class c){
         ObjectMapper mapper = new ObjectMapper();
-        //Staff obj = mapper.readValue(new URL("http://mkyong.com/api/staff.json"), Staff.class);
-
         Object obj = null;
         try {
             obj = mapper.readValue(json, c);
