@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+@CrossOrigin
 @Controller
 public class UsersController {
 
@@ -34,7 +35,7 @@ public class UsersController {
     @Autowired
     private DrugsRepository drugsRepository;
 
-    @RequestMapping(value = "api/users/", method = RequestMethod.PUT)
+    @RequestMapping(value = "/api/users/", method = RequestMethod.PUT, produces="application/json")
     @ResponseBody
     public void storeNewUser(@RequestBody String userJson) {
         Users user = (Users) Converter.convertFromJson(userJson, Users.class);
@@ -42,39 +43,38 @@ public class UsersController {
     }
 
 
-    @RequestMapping(value="/api/users/{user-id}", method=RequestMethod.GET)
+    @RequestMapping(value="/api/users/{user-id}", method=RequestMethod.GET, produces="application/json")
     public String getUser(@PathVariable("user-id") String userId){
         Users user = userRepository.getUserById(userId);
         return Converter.convertToJson(user);
     }
 
-    @RequestMapping(value="/api/users/", method=RequestMethod.POST)
+    @RequestMapping(value="/api/users/", method=RequestMethod.POST, produces="application/json")
     public void postUser(@RequestBody String userJson){
         Users user = (Users) Converter.convertFromJson(userJson, Users.class);
         userRepository.addUser(user);
     }
 
-    @RequestMapping(value="/api/users/{user-id}", method=RequestMethod.PUT)
+    @RequestMapping(value="/api/users/{user-id}", method=RequestMethod.PUT, produces="application/json")
     public void editUser(@PathVariable("user-id") String userId, @RequestBody String userJson){
         Users user = (Users) Converter.convertFromJson(userJson, Users.class);
         userRepository.updateUser(userId, user);
     }
 
-    @RequestMapping(value="/api/users/{user-id}", method=RequestMethod.DELETE)
+    @RequestMapping(value="/api/users/{user-id}", method=RequestMethod.DELETE, produces="application/json")
     public void deleteUser(@PathVariable("user-id")String userId){
         userRepository.deleteUser(userId);
     }
 
-    @RequestMapping(value="/api/users/{user-id}/drugs", method=RequestMethod.GET)
-    public String getConflicts(@PathVariable("user-id")String userId){
+    @RequestMapping(value="/api/users/{user-id}/drugs", method=RequestMethod.GET, produces="application/json")
+    public String getAllDrugsOfUser(@PathVariable("user-id")String userId){
         UsersHistory history = historyRepository.getUserHistoryById(userId);
         if(history==null)return "";
         List<UsersHistory.HistoryItem> items = history.allItems;
-        List<Drugs> possibleConflicts = ConflictCheck.checkForConflicts(items);
-        return Converter.convertToJson(possibleConflicts);
+        return Converter.convertToJson(items);
     }
 
-    @RequestMapping(value="/api/users/{user-id}/drugs", method=RequestMethod.PUT)
+    @RequestMapping(value="/api/users/{user-id}/drugs", method=RequestMethod.PUT, produces="application/json")
     public void getConflicts(@RequestBody String drugList, @PathVariable("user-id")String userId){
         UsersHistory history = new UsersHistory();
         if(history==null)return;
@@ -82,7 +82,7 @@ public class UsersController {
         historyRepository.updateUserHistory(history.getId(), history);
     }
 
-    @RequestMapping(value="/api/users/{user-id}/drugs/{drug-id}", method=RequestMethod.DELETE)
+    @RequestMapping(value="/api/users/{user-id}/drugs/{drug-id}", method=RequestMethod.DELETE, produces="application/json")
     public void deleteDrugFromList(@PathVariable("user-id")String userId, @PathVariable("drug-id")String drugId){
         UsersHistory history = historyRepository.getUserHistoryById(userId);
         if(history==null)return;
@@ -94,7 +94,7 @@ public class UsersController {
         historyRepository.updateUserHistory(userId, history);
     }
 
-    @RequestMapping(value="/api/users/{user-id}/history/{swiss-medical-id}", method=RequestMethod.PUT)
+    @RequestMapping(value="/api/users/{user-id}/history/{swiss-medical-id}", method=RequestMethod.PUT, produces="application/json")
     public void addDrugToList(@PathVariable("user-id")String userId, @PathVariable("swiss-medical-id") String drugId){
         Drugs drug = drugsRepository.getDrugById(drugId);
         if(drug!=null){
@@ -103,7 +103,7 @@ public class UsersController {
     }
 
 
-    @RequestMapping(value="/api/users/{user-id}/drugs/conflict/{swiss-medic-id}", method=RequestMethod.GET)
+    @RequestMapping(value="/api/users/{user-id}/drugs/conflict/{swiss-medic-id}", method=RequestMethod.GET, produces="application/json")
     public String getConflictsById(@PathVariable("user-id") String userId, @PathVariable("swiss-medic-id")String medicId){
         UsersHistory history = historyRepository.getUserHistoryById(userId);
         Drugs drug = drugsRepository.getDrugById(medicId);
