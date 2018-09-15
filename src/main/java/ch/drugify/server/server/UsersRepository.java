@@ -13,7 +13,7 @@ import java.util.List;
 @Repository
 public class UsersRepository {
 
-    public static final String PERSON_COLLECTION_NAME = "users";
+    public static final String USER_COLLECTION_NAME = "users";
 
     @Autowired
     private MongoTemplate mongo;
@@ -22,23 +22,22 @@ public class UsersRepository {
         if(!mongo.collectionExists(Users.class)){
             mongo.createCollection(Users.class);
         }
-        mongo.insert(user, PERSON_COLLECTION_NAME);
+        mongo.insert(user, USER_COLLECTION_NAME);
     }
 
     public Users getUserById(String userId) {
         Query user = Query.query(Criteria.where("id").is(userId));
-        Users u = mongo.findOne(user, Users.class, PERSON_COLLECTION_NAME);
+        Users u = mongo.findOne(user, Users.class, USER_COLLECTION_NAME);
         return u;
     }
 
     public List getAllUsers() {
-        return mongo.findAll(Users.class, PERSON_COLLECTION_NAME);
+        return mongo.findAll(Users.class, USER_COLLECTION_NAME);
     }
 
-    public Users deleteUser(String name) {
-        Users user = mongo.findOne(Query.query(Criteria.where("lastname").is(name)),
-                Users.class, PERSON_COLLECTION_NAME);
-        mongo.remove(user, PERSON_COLLECTION_NAME);
+    public Users deleteUser(String userId) {
+        Users user = mongo.findOne(Query.query(Criteria.where("id").is(userId)), Users.class, USER_COLLECTION_NAME);
+        mongo.remove(user, USER_COLLECTION_NAME);
 
         return user;
     }

@@ -24,8 +24,7 @@ import java.util.Locale;
 @Controller
 public class UsersController {
 
-    private static final Logger logger = LoggerFactory
-            .getLogger(UsersController.class);
+    private static final Logger logger = LoggerFactory.getLogger(UsersController.class);
 
     @Autowired
     private UsersRepository userRepository;
@@ -36,12 +35,9 @@ public class UsersController {
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public String home(Locale locale, Model model) {
-        logger.info(
-                "This is Default Home REST page.\n\n The client locale is {}.",
-                locale);
+        logger.info("This is Default Home REST page.\n\n The client locale is {}.", locale);
         Date date = new Date();
-        DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.LONG,
-                DateFormat.LONG, locale);
+        DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, locale);
         String formattedDate = dateFormat.format(date);
         model.addAttribute("serverTime", formattedDate);
         return "status";
@@ -49,10 +45,9 @@ public class UsersController {
 
     @RequestMapping(value = "api/users/", method = RequestMethod.PUT)
     @ResponseBody
-    public String getAllPersons(@RequestBody()String userJson) {
+    public void storeNewUser(@RequestBody String userJson) {
         Users user = (Users) Converter.convertFromJson(userJson, Users.class);
         userRepository.addUser(user);
-        return "allPersons";
     }
 
 
@@ -71,7 +66,7 @@ public class UsersController {
     @RequestMapping(value="/api/users/{user-id}", method=RequestMethod.PUT)
     public void editUser(@PathVariable("user-id") String userId, @RequestBody String userJson){
         Users user = (Users) Converter.convertFromJson(userJson, Users.class);
-        userRepository.addUser(user);
+        userRepository.updateUser(userId, user);
     }
 
     @RequestMapping(value="/api/users/{user-id}", method=RequestMethod.DELETE)
@@ -83,8 +78,8 @@ public class UsersController {
     public String getConflicts(@PathVariable("user-id")String userId){
         UsersHistory history = historyRepository.getUserHistoryById(userId);
         List<UsersHistory.HistoryItem> items = history.allItems;
-
-        return null;
+        List<Drugs> possibleConflicts = ConflictCheck.checkForConflicts(items);
+        return Converter.convertToJson(possibleConflicts);
     }
 
     @RequestMapping(value="/api/users/{user-id}/drugs", method=RequestMethod.PUT)
@@ -94,13 +89,15 @@ public class UsersController {
         historyRepository.updateUserHistory(history.getId(), history);
     }
 
-    @RequestMapping(value="/api/users/{user-id}/drugs/{swiss-medic-id}", method=RequestMethod.PUT)
-    public void addDrugById(@PathVariable("user-id")String userId, @PathVariable("swiss-medic-id")String drugId){
-
-    }
-
+    @RequestMapping(value="/api/users/{user-id}/drugs/{drug-id}", method=RequestMethod.DELETE)
     public void deleteDrugFromList(@PathVariable("user-id")String userId, @PathVariable("drug-id")String drugId){
-
+        UsersHistory history = historyRepository.getUserHistoryById(userId);
+        history.allItems.stream().forEach(i -> {
+            if(i.drugId.equals(drugId)){
+                history.allItems.remove(i);
+            }
+        });
+        historyRepository.updateUserHistory(userId, history);
     }
 
 
