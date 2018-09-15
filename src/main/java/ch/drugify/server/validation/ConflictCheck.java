@@ -1,13 +1,12 @@
-package ch.drugify.validation;
+package ch.drugify.server.validation;
 
-import ch.drugify.entities.Drugs;
-import ch.drugify.entities.UsersHistory;
+import ch.drugify.server.entities.Drugs;
+import ch.drugify.server.entities.UsersHistory;
 
 import java.util.Collections;
 import java.util.List;
 
 public class ConflictCheck {
-
     public static List<Drugs> checkForConflicts(Drugs drug, List<UsersHistory.HistoryItem> alreadyConsumed){
         return Collections.emptyList();
     }

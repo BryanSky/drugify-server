@@ -1,4 +1,4 @@
-package ch.drugify.utility;
+package ch.drugify.server.utility;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

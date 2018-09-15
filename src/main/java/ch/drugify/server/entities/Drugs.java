@@ -1,4 +1,4 @@
-package ch.drugify.entities;
+package ch.drugify.server.entities;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.bson.types.ObjectId;

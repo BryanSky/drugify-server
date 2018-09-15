@@ -1,4 +1,4 @@
-package ch.drugify.entities;
+package ch.drugify.server.entities;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
