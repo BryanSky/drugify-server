@@ -18,37 +18,4 @@ public class UsersHistory {
     public String getId() { return id.toHexString(); }
     public void setId(ObjectId id) { this.id = id; }
 
-    public class HistoryItem{
-
-        @JsonProperty()
-        public String drugId;
-        @JsonProperty()
-        public Instant created;
-        @JsonProperty()
-        public Instant updated;
-
-        public String getDrugId() {
-            return drugId;
-        }
-
-        public void setDrugId(String drugId) {
-            this.drugId = drugId;
-        }
-
-        public Instant getCreated() {
-            return created;
-        }
-
-        public void setCreated(Instant created) {
-            this.created = created;
-        }
-
-        public Instant getUpdated() {
-            return updated;
-        }
-
-        public void setUpdated(Instant updated) {
-            this.updated = updated;
-        }
-    }
 }

@@ -1,6 +1,7 @@
 package ch.drugify.server.webservices;
 
 import ch.drugify.server.entities.Drugs;
+import ch.drugify.server.entities.HistoryItem;
 import ch.drugify.server.entities.Users;
 import ch.drugify.server.entities.UsersHistory;
 import ch.drugify.server.server.DrugsRepository;
@@ -12,15 +13,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import javax.websocket.server.PathParam;
-import java.text.DateFormat;
-import java.util.Collections;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
+//import javax.ws.rs.core.Response;
 
 @CrossOrigin(origins = "*")
 @Controller
@@ -44,9 +40,9 @@ public class UsersController {
 
 
     @RequestMapping(value="/api/users/{user-id}", method=RequestMethod.GET, produces="application/json")
-    public Response getUser(@PathVariable("user-id") String userId){
+    public String getUser(@PathVariable("user-id") String userId){
         Users user = userRepository.getUserById(userId);
-        return Response.ok(Converter.convertToJson(user);
+        return Converter.convertToJson(user);
     }
 
     @RequestMapping(value="/api/users/", method=RequestMethod.POST, produces="application/json")
@@ -70,7 +66,7 @@ public class UsersController {
     public String getAllDrugsOfUser(@PathVariable("user-id")String userId){
         UsersHistory history = historyRepository.getUserHistoryById(userId);
         if(history==null)return "";
-        List<UsersHistory.HistoryItem> items = history.allItems;
+        List<HistoryItem> items = history.allItems;
         return Converter.convertToJson(items);
     }
 
@@ -78,7 +74,7 @@ public class UsersController {
     public void getConflicts(@RequestBody String drugList, @PathVariable("user-id")String userId){
         UsersHistory history = new UsersHistory();
         if(history==null)return;
-        history.allItems = (List<UsersHistory.HistoryItem>) Converter.convertFromJson(drugList, drugList.getClass());
+        history.allItems = (List<HistoryItem>) Converter.convertFromJson(drugList, drugList.getClass());
         historyRepository.updateUserHistory(history.getId(), history);
     }
 
@@ -87,7 +83,7 @@ public class UsersController {
         UsersHistory history = historyRepository.getUserHistoryById(userId);
         if(history==null)return;
         history.allItems.stream().forEach(i -> {
-            if(i.drugId.equals(drugId)){
+            if(i.getSwissMedicId().equals(drugId)){
                 history.allItems.remove(i);
             }
         });
@@ -95,10 +91,13 @@ public class UsersController {
     }
 
     @RequestMapping(value="/api/users/{user-id}/history/{swiss-medical-id}", method=RequestMethod.PUT, produces="application/json")
-    public void addDrugToList(@PathVariable("user-id")String userId, @PathVariable("swiss-medical-id") String drugId){
+    public void addDrugToList(@PathVariable("user-id")String userId, @PathVariable("swiss-medical-id") String drugId, @RequestBody String body){
         Drugs drug = drugsRepository.getDrugById(drugId);
+        UsersHistory history = historyRepository.getUserHistoryById(userId);
         if(drug!=null){
-            historyRepository.updateUserHistory(userId, drug);
+            long start = Converter.getLong("start", body);
+            long end = Converter.getLong("end", body);
+            historyRepository.updateUserHistory(history, userId, drug, start, end);
         }
     }
 

@@ -1,6 +1,7 @@
 package ch.drugify.server.server;
 
 import ch.drugify.server.entities.Drugs;
+import ch.drugify.server.entities.HistoryItem;
 import ch.drugify.server.entities.Users;
 import ch.drugify.server.entities.UsersHistory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.List;
 
 @Repository
@@ -56,9 +58,22 @@ public class UsersHistoryRepository {
         return userHistory;
     }
 
-    public void updateUserHistory(String id, Drugs drug){
+    public void updateUserHistory(UsersHistory history, String id, Drugs drug, long start, long end){
+        HistoryItem item = new HistoryItem();
+        item.setCreated(Instant.now());
+        item.setUpdated(Instant.now());
+        item.setStart(start);
+        item.setEnd(end);
+        item.setSwissMedicId(drug.getAuthNrs());
+        item.setTitle(drug.getTitle());
+        history.allItems.add(item);
+
         Query query = new Query();
         query.addCriteria(Criteria.where("id").is(id));
 
+        Update update = new Update();
+        update.set("allItems", history.allItems);
+
+        mongo.updateFirst(query, update, history.getClass());
     }
 }

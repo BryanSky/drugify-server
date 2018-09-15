@@ -2,6 +2,8 @@ package ch.drugify.server.utility;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mongodb.util.JSON;
+import net.minidev.json.JSONObject;
 
 import java.io.IOException;
 
@@ -31,4 +33,7 @@ public class Converter {
         return obj;
     }
 
+    public static long getLong(String key, String body) {
+        return 0;
+    }
 }
