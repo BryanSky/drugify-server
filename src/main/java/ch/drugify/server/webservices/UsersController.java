@@ -44,9 +44,9 @@ public class UsersController {
 
 
     @RequestMapping(value="/api/users/{user-id}", method=RequestMethod.GET, produces="application/json")
-    public String getUser(@PathVariable("user-id") String userId){
+    public Response getUser(@PathVariable("user-id") String userId){
         Users user = userRepository.getUserById(userId);
-        return Converter.convertToJson(user);
+        return Response.ok(Converter.convertToJson(user);
     }
 
     @RequestMapping(value="/api/users/", method=RequestMethod.POST, produces="application/json")
