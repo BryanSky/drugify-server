@@ -1,5 +1,6 @@
 package ch.drugify.server.server;
 
+import ch.drugify.server.entities.Drugs;
 import ch.drugify.server.entities.Users;
 import ch.drugify.server.entities.UsersHistory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,5 +54,11 @@ public class UsersHistoryRepository {
         mongo.updateFirst(query, update, UsersHistory.class);
 
         return userHistory;
+    }
+
+    public void updateUserHistory(String id, Drugs drug){
+        Query query = new Query();
+        query.addCriteria(Criteria.where("id").is(id));
+
     }
 }
