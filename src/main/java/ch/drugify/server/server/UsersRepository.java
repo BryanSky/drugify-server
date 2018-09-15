@@ -38,7 +38,6 @@ public class UsersRepository {
     public Users deleteUser(String userId) {
         Users user = mongo.findOne(Query.query(Criteria.where("id").is(userId)), Users.class, USER_COLLECTION_NAME);
         mongo.remove(user, USER_COLLECTION_NAME);
-
         return user;
     }
 

@@ -13,12 +13,19 @@ public class Drugs {
 
     @JsonProperty()
     private String authHolder;
+    @JsonProperty()
     private String atcCode;
+    @JsonProperty()
     private String substances;
+    @JsonProperty()
     private String authNrs;
+    @JsonProperty()
     private String remark;
+    @JsonProperty()
     private String style;
+    @JsonProperty()
     private String content;
+    @JsonProperty()
     private String type;
 
     public Drugs(){

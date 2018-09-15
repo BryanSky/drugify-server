@@ -26,7 +26,7 @@ public class DrugsRepository {
     }
 
     public Drugs getDrugById(String drugId) {
-        Query drug = Query.query(Criteria.where("id").is(drugId));
+        Query drug = Query.query(Criteria.where("authNrs").is(drugId));
         Drugs d = mongo.findOne(drug, Drugs.class, DRUGS_COLLECTION_NAME);
         return d;
     }
@@ -36,15 +36,14 @@ public class DrugsRepository {
     }
 
     public Drugs deleteDrugs(String drugId) {
-        Drugs drug = mongo.findOne(Query.query(Criteria.where("id").is(drugId)),
+        Drugs drug = mongo.findOne(Query.query(Criteria.where("authNrs").is(drugId)),
                 Drugs.class, DRUGS_COLLECTION_NAME);
-        mongo.remove(drug, DRUGS_COLLECTION_NAME);
         return drug;
     }
 
     public Drugs updateDrug(String drugId, Drugs drug) {
         Query query = new Query();
-        query.addCriteria(Criteria.where("id").is(drugId));
+        query.addCriteria(Criteria.where("authNrs").is(drugId));
 
         Update update = new Update();
         //update.set("name", drug.getLastname());

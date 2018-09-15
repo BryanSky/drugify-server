@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.websocket.server.PathParam;
 import java.text.DateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -32,16 +33,6 @@ public class UsersController {
     private UsersHistoryRepository historyRepository;
     @Autowired
     private DrugsRepository drugsRepository;
-
-    @RequestMapping(value = "/", method = RequestMethod.GET)
-    public String home(Locale locale, Model model) {
-        logger.info("This is Default Home REST page.\n\n The client locale is {}.", locale);
-        Date date = new Date();
-        DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, locale);
-        String formattedDate = dateFormat.format(date);
-        model.addAttribute("serverTime", formattedDate);
-        return "status";
-    }
 
     @RequestMapping(value = "api/users/", method = RequestMethod.PUT)
     @ResponseBody
@@ -77,6 +68,7 @@ public class UsersController {
     @RequestMapping(value="/api/users/{user-id}/drugs", method=RequestMethod.GET)
     public String getConflicts(@PathVariable("user-id")String userId){
         UsersHistory history = historyRepository.getUserHistoryById(userId);
+        if(history==null)return "";
         List<UsersHistory.HistoryItem> items = history.allItems;
         List<Drugs> possibleConflicts = ConflictCheck.checkForConflicts(items);
         return Converter.convertToJson(possibleConflicts);
@@ -85,6 +77,7 @@ public class UsersController {
     @RequestMapping(value="/api/users/{user-id}/drugs", method=RequestMethod.PUT)
     public void getConflicts(@RequestBody String drugList, @PathVariable("user-id")String userId){
         UsersHistory history = new UsersHistory();
+        if(history==null)return;
         history.allItems = (List<UsersHistory.HistoryItem>) Converter.convertFromJson(drugList, drugList.getClass());
         historyRepository.updateUserHistory(history.getId(), history);
     }
@@ -92,6 +85,7 @@ public class UsersController {
     @RequestMapping(value="/api/users/{user-id}/drugs/{drug-id}", method=RequestMethod.DELETE)
     public void deleteDrugFromList(@PathVariable("user-id")String userId, @PathVariable("drug-id")String drugId){
         UsersHistory history = historyRepository.getUserHistoryById(userId);
+        if(history==null)return;
         history.allItems.stream().forEach(i -> {
             if(i.drugId.equals(drugId)){
                 history.allItems.remove(i);
@@ -100,12 +94,23 @@ public class UsersController {
         historyRepository.updateUserHistory(userId, history);
     }
 
+    @RequestMapping(value="/api/users/{user-id}/history/{swiss-medical-id}", method=RequestMethod.PUT)
+    public void addDrugToList(@PathVariable("user-id")String userId, @PathVariable("swiss-medical-id") String drugId){
+        Drugs drug = drugsRepository.getDrugById(drugId);
+        if(drug!=null){
+            historyRepository.updateUserHistory(userId, drug);
+        }
+    }
+
 
     @RequestMapping(value="/api/users/{user-id}/drugs/conflict/{swiss-medic-id}", method=RequestMethod.GET)
     public String getConflictsById(@PathVariable("user-id") String userId, @PathVariable("swiss-medic-id")String medicId){
         UsersHistory history = historyRepository.getUserHistoryById(userId);
         Drugs drug = drugsRepository.getDrugById(medicId);
-        List<Drugs> conflictItems = ConflictCheck.checkForConflicts(drug, history.allItems);
-        return Converter.convertToJson(conflictItems);
+        if(history!=null){
+            List<Drugs> conflictItems = ConflictCheck.checkForConflicts(drug, history.allItems);
+            return Converter.convertToJson(conflictItems);
+        }
+        return "";
     }
 }

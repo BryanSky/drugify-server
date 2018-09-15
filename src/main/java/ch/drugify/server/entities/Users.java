@@ -1,14 +1,19 @@
 package ch.drugify.server.entities;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 
 public class Users {
     @Id()
     public ObjectId id;
+    @JsonProperty()
     private String firstname;
+    @JsonProperty()
     private String lastname;
+    @JsonProperty()
     private String mail;
+    @JsonProperty()
     private String userName;
 
     public String getId() { return id.toHexString(); }
