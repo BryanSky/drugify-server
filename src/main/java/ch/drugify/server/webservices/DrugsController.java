@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.websocket.server.PathParam;
 
-@CrossOrigin
+@CrossOrigin(origins = "*")
 @RestController
 public class DrugsController {
 

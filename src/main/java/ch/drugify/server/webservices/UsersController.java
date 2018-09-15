@@ -22,7 +22,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-@CrossOrigin
+@CrossOrigin(origins = "*")
 @Controller
 public class UsersController {
 
